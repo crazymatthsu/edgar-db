@@ -10,7 +10,7 @@ import httpx
 import pytest
 import respx
 
-from edgar_db.client import BASE_URL, EdgarClient
+from edgar_db.client import BASE_URL, COMPANY_TICKERS_URL, EdgarClient
 from edgar_db.config import Config
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -31,7 +31,7 @@ def client(config: Config) -> EdgarClient:
 class TestGetCompanyTickers:
     @respx.mock
     def test_fetches_tickers(self, client: EdgarClient, sample_tickers_json: dict) -> None:
-        respx.get(f"{BASE_URL}/files/company_tickers.json").mock(
+        respx.get(COMPANY_TICKERS_URL).mock(
             return_value=httpx.Response(200, json=sample_tickers_json)
         )
         result = client.get_company_tickers()
@@ -40,7 +40,7 @@ class TestGetCompanyTickers:
 
     @respx.mock
     def test_retries_on_500(self, client: EdgarClient, sample_tickers_json: dict) -> None:
-        route = respx.get(f"{BASE_URL}/files/company_tickers.json")
+        route = respx.get(COMPANY_TICKERS_URL)
         route.side_effect = [
             httpx.Response(500),
             httpx.Response(200, json=sample_tickers_json),
@@ -50,7 +50,7 @@ class TestGetCompanyTickers:
 
     @respx.mock
     def test_raises_on_persistent_failure(self, client: EdgarClient) -> None:
-        respx.get(f"{BASE_URL}/files/company_tickers.json").mock(
+        respx.get(COMPANY_TICKERS_URL).mock(
             return_value=httpx.Response(500)
         )
         with pytest.raises(httpx.HTTPStatusError):

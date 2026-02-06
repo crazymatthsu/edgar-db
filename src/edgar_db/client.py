@@ -10,7 +10,7 @@ import httpx
 from .config import Config
 
 BASE_URL = "https://data.sec.gov"
-COMPANY_TICKERS_URL = f"{BASE_URL}/files/company_tickers.json"
+COMPANY_TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 COMPANY_FACTS_URL = f"{BASE_URL}/api/xbrl/companyfacts/CIK{{cik}}.json"
 
 
