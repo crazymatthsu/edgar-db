@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edgar-db"
+version = "0.1.0"
+description = "Download SEC EDGAR financial data into SQLite for AI and quantitative analysis"
+requires-python = ">=3.10"
+dependencies = [
+    "httpx>=0.27",
+    "click>=8.0",
+    "pandas>=2.0",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "respx>=0.22",
+]
+
+[project.scripts]
+edgar-db = "edgar_db.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
