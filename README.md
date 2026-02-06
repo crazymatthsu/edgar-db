@@ -230,5 +230,5 @@ export EDGAR_DB_PATH="/custom/path/data.db"
 
 ```bash
 pip install -e ".[dev]"
-pytest tests/
+pytest db/tests/
 ```

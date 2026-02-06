@@ -19,9 +19,21 @@ dev = [
     "pytest>=8.0",
     "respx>=0.22",
 ]
+api = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+]
+ui = [
+    "streamlit>=1.40",
+    "plotly>=5.24",
+    "httpx>=0.27",
+]
+all = [
+    "edgar-db[api,ui]",
+]
 
 [project.scripts]
 edgar-db = "edgar_db.cli:cli"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["db/src"]
