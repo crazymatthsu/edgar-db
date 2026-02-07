@@ -36,4 +36,5 @@ all = [
 edgar-db = "edgar_db.cli:cli"
 
 [tool.setuptools.packages.find]
-where = ["db/src"]
+where = ["db/src", "ui/src"]
+include = ["edgar_db*", "edgar_ui*"]

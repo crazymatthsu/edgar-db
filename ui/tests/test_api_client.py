@@ -6,7 +6,7 @@ import httpx
 import pytest
 import respx
 
-from ui.frontend.api_client import EdgarAPIClient
+from edgar_ui.frontend.api_client import EdgarAPIClient
 
 
 @pytest.fixture

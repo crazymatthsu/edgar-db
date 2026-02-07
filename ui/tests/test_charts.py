@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import plotly.graph_objects as go
 
-from ui.frontend.charts import build_chart
+from edgar_ui.frontend.charts import build_chart
 
 
 class TestBuildChart:

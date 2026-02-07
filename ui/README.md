@@ -7,7 +7,8 @@ Interactive web interface for the EDGAR financial database, with a FastAPI REST 
 ```
 ┌─────────────────┐     HTTP/JSON     ┌──────────────────┐
 │  Streamlit UI   │ ◄──────────────► │  FastAPI Backend  │
-│  (frontend/)    │                   │  (backend/)       │
+│ (src/edgar_ui/  │                   │ (src/edgar_ui/    │
+│   frontend/)    │                   │   backend/)       │
 └─────────────────┘                   └────────┬─────────┘
                                                │
                                         ┌──────┴──────┐
@@ -39,7 +40,7 @@ export EDGAR_USER_AGENT="YourApp your@email.com"
 export EDGAR_DB_PATH="/path/to/edgar.db"
 
 # Start the API server
-uvicorn ui.backend.app:app --host 0.0.0.0 --port 8000
+uvicorn edgar_ui.backend.app:app --host 0.0.0.0 --port 8000
 
 # API docs available at: http://localhost:8000/docs
 ```
@@ -51,7 +52,7 @@ uvicorn ui.backend.app:app --host 0.0.0.0 --port 8000
 export EDGAR_API_URL="http://localhost:8000"
 
 # Start Streamlit
-streamlit run ui/frontend/app.py
+streamlit run ui/src/edgar_ui/frontend/app.py
 
 # Opens in browser at: http://localhost:8501
 ```
@@ -89,6 +90,6 @@ pytest ui/tests/ -v
 
 1. Push your repo to GitHub
 2. Go to [share.streamlit.io](https://share.streamlit.io)
-3. Select your repo, branch, and set the main file to `ui/frontend/app.py`
+3. Select your repo, branch, and set the main file to `ui/src/edgar_ui/frontend/app.py`
 4. Set secrets/environment variables:
    - `EDGAR_API_URL` — URL of your running FastAPI backend

@@ -10,8 +10,8 @@ from fastapi.testclient import TestClient
 
 from edgar_db.db import connect_db, upsert_company, upsert_facts, upsert_ticker_map
 from edgar_db.models import Company, FactRow
-from ui.backend.app import app
-from ui.backend.dependencies import close_conn, set_db_path
+from edgar_ui.backend.app import app
+from edgar_ui.backend.dependencies import close_conn, set_db_path
 
 # Re-export for use in test files
 _conn_ref: sqlite3.Connection | None = None
@@ -88,7 +88,7 @@ def seeded_db(tmp_path: Path) -> sqlite3.Connection:
 @pytest.fixture
 def client(seeded_db: sqlite3.Connection, tmp_path: Path) -> TestClient:
     """FastAPI test client with seeded database."""
-    import ui.backend.dependencies as deps
+    import edgar_ui.backend.dependencies as deps
 
     db_path = tmp_path / "test.db"
     # Inject the seeded connection into the dependency module
