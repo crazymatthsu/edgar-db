@@ -30,7 +30,14 @@ def set_db_path(path: Path) -> None:
 def get_conn() -> sqlite3.Connection:
     global _conn
     if _conn is None:
-        _conn = connect_db(get_db_path())
+        db_path = get_db_path()
+        # Init schema, then reopen with check_same_thread=False
+        # so the connection works across FastAPI's worker threads
+        init_conn = connect_db(db_path)
+        init_conn.close()
+        _conn = sqlite3.connect(str(db_path), check_same_thread=False)
+        _conn.execute("PRAGMA journal_mode=WAL")
+        _conn.execute("PRAGMA foreign_keys=ON")
     return _conn
 
 
