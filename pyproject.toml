@@ -28,13 +28,17 @@ ui = [
     "plotly>=5.24",
     "httpx>=0.27",
 ]
+yfinance = [
+    "yfinance>=0.2.36",
+]
 all = [
-    "edgar-db[api,ui]",
+    "edgar-db[api,ui,yfinance]",
 ]
 
 [project.scripts]
 edgar-db = "edgar_db.cli:cli"
+yfinance-db = "yfinance_db.cli:cli"
 
 [tool.setuptools.packages.find]
 where = ["db/src", "ui/src"]
-include = ["edgar_db*", "edgar_ui*"]
+include = ["edgar_db*", "edgar_ui*", "yfinance_db*"]
