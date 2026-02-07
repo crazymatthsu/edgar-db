@@ -9,6 +9,7 @@
     
     - a new ui to compare multiple companies financial results matrix 
     - be able to list out a list of saved symbols or multiple baskets / portfolios
+
 ### db-yahoo
     - a module that will download market data from yahoo 
 
