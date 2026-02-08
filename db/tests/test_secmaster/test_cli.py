@@ -144,6 +144,124 @@ def test_search_command(tmp_path: Path, runner: CliRunner) -> None:
         assert "AAPL" in result.output
 
 
+def test_download_index_no_args(runner: CliRunner) -> None:
+    result = runner.invoke(cli, ["download-index"])
+    assert result.exit_code != 0
+    assert "Provide an index code" in result.output
+
+
+def test_download_index_unknown(runner: CliRunner) -> None:
+    with patch("secmaster_db.cli._get_config") as mock_get_config:
+        mock_config = MagicMock()
+        mock_config.db_path = Path("/tmp/test_not_used.db")
+        mock_get_config.return_value = mock_config
+        result = runner.invoke(cli, ["download-index", "INVALID"])
+    assert result.exit_code != 0
+    assert "Unknown index" in result.output
+
+
+def test_download_index_single(tmp_path: Path, runner: CliRunner) -> None:
+    db_path = tmp_path / "test.db"
+
+    from secmaster_db.db import connect_db
+    conn = connect_db(db_path)
+    conn.close()
+
+    fake_resp = MagicMock()
+    fake_resp.text = '<table><tr><th>Symbol</th></tr><tr><td>AAPL</td></tr><tr><td>MSFT</td></tr></table>'
+    fake_resp.raise_for_status = MagicMock()
+
+    with patch("secmaster_db.cli._get_config") as mock_get_config, \
+         patch("secmaster_db.indexes.httpx.get", return_value=fake_resp):
+        mock_config = MagicMock()
+        mock_config.db_path = db_path
+        mock_get_config.return_value = mock_config
+
+        result = runner.invoke(cli, ["download-index", "SPX"])
+        assert result.exit_code == 0
+        assert "components saved" in result.output
+
+
+def test_download_index_all(tmp_path: Path, runner: CliRunner) -> None:
+    db_path = tmp_path / "test.db"
+
+    from secmaster_db.db import connect_db
+    conn = connect_db(db_path)
+    conn.close()
+
+    fake_resp = MagicMock()
+    fake_resp.text = '<table><tr><th>Symbol</th></tr><tr><td>AAPL</td></tr></table>'
+    fake_resp.raise_for_status = MagicMock()
+
+    with patch("secmaster_db.cli._get_config") as mock_get_config, \
+         patch("secmaster_db.indexes.httpx.get", return_value=fake_resp):
+        mock_config = MagicMock()
+        mock_config.db_path = db_path
+        mock_get_config.return_value = mock_config
+
+        result = runner.invoke(cli, ["download-index", "--all"])
+        assert result.exit_code == 0
+        assert "SPX" in result.output
+        assert "DJI" in result.output
+        assert "NDX" in result.output
+
+
+def test_show_index_empty(tmp_path: Path, runner: CliRunner) -> None:
+    db_path = tmp_path / "test.db"
+
+    from secmaster_db.db import connect_db
+    conn = connect_db(db_path)
+    conn.close()
+
+    with patch("secmaster_db.cli._get_config") as mock_get_config:
+        mock_config = MagicMock()
+        mock_config.db_path = db_path
+        mock_get_config.return_value = mock_config
+
+        result = runner.invoke(cli, ["show-index", "SPX"])
+        assert result.exit_code == 0
+        assert "no components" in result.output.lower()
+
+
+def test_show_index_with_data(tmp_path: Path, runner: CliRunner) -> None:
+    db_path = tmp_path / "test.db"
+
+    from secmaster_db.db import connect_db, upsert_index_components
+    conn = connect_db(db_path)
+    upsert_index_components(conn, "SPX", ["AAPL", "MSFT"], "2024-01-01")
+    conn.close()
+
+    with patch("secmaster_db.cli._get_config") as mock_get_config:
+        mock_config = MagicMock()
+        mock_config.db_path = db_path
+        mock_get_config.return_value = mock_config
+
+        result = runner.invoke(cli, ["show-index", "SPX"])
+        assert result.exit_code == 0
+        assert "AAPL" in result.output
+        assert "MSFT" in result.output
+        assert "2" in result.output
+        assert "tickers" in result.output
+
+
+def test_info_shows_indexes(tmp_path: Path, runner: CliRunner) -> None:
+    db_path = tmp_path / "test.db"
+
+    from secmaster_db.db import connect_db, upsert_index_components
+    conn = connect_db(db_path)
+    upsert_index_components(conn, "SPX", ["AAPL", "MSFT"], "2024-01-01")
+    conn.close()
+
+    with patch("secmaster_db.cli._get_config") as mock_get_config:
+        mock_config = MagicMock()
+        mock_config.db_path = db_path
+        mock_get_config.return_value = mock_config
+
+        result = runner.invoke(cli, ["info"])
+        assert result.exit_code == 0
+        assert "SPX" in result.output
+
+
 def test_search_no_results(tmp_path: Path, runner: CliRunner) -> None:
     db_path = tmp_path / "test.db"
 

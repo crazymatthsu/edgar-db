@@ -84,6 +84,68 @@ def download(ticker: tuple[str, ...], sp500: bool, force: bool, no_figi: bool) -
     conn.close()
 
 
+@cli.command("download-index")
+@click.argument("index_code", required=False)
+@click.option("--all", "all_indexes", is_flag=True, help="Download all supported indexes")
+def download_index(index_code: str | None, all_indexes: bool) -> None:
+    """Download index components (e.g. SPX, DJI, NDX)."""
+    from .db import upsert_index_components
+    from .indexes import INDEXES, get_index_tickers, list_supported_indexes
+
+    if not index_code and not all_indexes:
+        supported = ", ".join(list_supported_indexes())
+        console.print(f"[red]Error:[/red] Provide an index code ({supported}) or --all")
+        sys.exit(1)
+
+    codes = list(INDEXES) if all_indexes else [index_code.upper()]
+
+    for code in codes:
+        if code not in INDEXES:
+            console.print(f"[red]Error:[/red] Unknown index: {code}. Supported: {', '.join(list_supported_indexes())}")
+            sys.exit(1)
+
+    config = _get_config()
+    config.ensure_db_dir()
+    conn = connect_db(config.db_path)
+
+    for code in codes:
+        name, _ = INDEXES[code]
+        console.print(f"Fetching {name} ({code}) components...")
+        try:
+            tickers = get_index_tickers(code)
+            upsert_index_components(conn, code, tickers)
+            console.print(f"  {code}: {len(tickers)} components saved")
+        except Exception as exc:
+            console.print(f"  [red]Error fetching {code}: {exc}[/red]")
+
+    conn.close()
+
+
+@cli.command("show-index")
+@click.argument("index_code")
+def show_index(index_code: str) -> None:
+    """Show component tickers for an index."""
+    config = _get_config()
+    conn = connect_db(config.db_path)
+    q = SecMasterQuery(conn)
+
+    df = q.get_index_components(index_code)
+    if df.empty:
+        console.print(f"[yellow]No components for {index_code.upper()}. Try: secmaster-db download-index {index_code.upper()}[/yellow]")
+        conn.close()
+        return
+
+    table = Table(title=f"{index_code.upper()} Components ({len(df)} tickers)")
+    table.add_column("Ticker", style="bold")
+    table.add_column("Last Updated")
+
+    for _, row in df.iterrows():
+        table.add_row(row["ticker"], row["last_updated"])
+
+    console.print(table)
+    conn.close()
+
+
 @cli.command()
 @click.argument("ticker")
 def show(ticker: str) -> None:
@@ -194,6 +256,14 @@ def info() -> None:
     table.add_row("Countries", str(stats["countries"]))
     table.add_row("With ISIN", str(stats["with_isin"]))
     table.add_row("With FIGI", str(stats["with_figi"]))
+
+    indexes = stats.get("indexes", {})
+    if indexes:
+        for code, count in sorted(indexes.items()):
+            table.add_row(f"Index: {code}", str(count))
+    else:
+        table.add_row("Indexes", "0")
+
     table.add_row("Database Path", str(config.db_path))
 
     console.print(table)

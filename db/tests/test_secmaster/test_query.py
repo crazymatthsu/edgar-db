@@ -4,7 +4,7 @@ import sqlite3
 
 import pytest
 
-from secmaster_db.db import upsert_security
+from secmaster_db.db import upsert_index_components, upsert_security
 from secmaster_db.query import SecMasterQuery
 
 from .conftest import _make_security
@@ -117,3 +117,40 @@ def test_empty_db(tmp_db: sqlite3.Connection) -> None:
     assert q.list_all().empty
     assert q.search(sector="Technology").empty
     assert q.list_by_sector().empty
+
+
+def test_get_index_components(tmp_db: sqlite3.Connection) -> None:
+    upsert_index_components(tmp_db, "SPX", ["AAPL", "MSFT", "GOOG"], "2024-01-01")
+    q = SecMasterQuery(tmp_db)
+    df = q.get_index_components("SPX")
+    assert len(df) == 3
+    assert list(df["ticker"]) == ["AAPL", "GOOG", "MSFT"]
+
+
+def test_get_index_components_case_insensitive(tmp_db: sqlite3.Connection) -> None:
+    upsert_index_components(tmp_db, "SPX", ["AAPL"], "2024-01-01")
+    q = SecMasterQuery(tmp_db)
+    df = q.get_index_components("spx")
+    assert len(df) == 1
+
+
+def test_get_index_components_empty(tmp_db: sqlite3.Connection) -> None:
+    q = SecMasterQuery(tmp_db)
+    df = q.get_index_components("SPX")
+    assert df.empty
+
+
+def test_get_indexes(tmp_db: sqlite3.Connection) -> None:
+    upsert_index_components(tmp_db, "SPX", ["AAPL", "MSFT"], "2024-01-01")
+    upsert_index_components(tmp_db, "DJI", ["AAPL"], "2024-01-02")
+    q = SecMasterQuery(tmp_db)
+    df = q.get_indexes()
+    assert len(df) == 2
+    assert list(df["index_code"]) == ["DJI", "SPX"]
+    assert list(df["count"]) == [1, 2]
+
+
+def test_get_indexes_empty(tmp_db: sqlite3.Connection) -> None:
+    q = SecMasterQuery(tmp_db)
+    df = q.get_indexes()
+    assert df.empty

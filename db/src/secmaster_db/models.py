@@ -23,3 +23,10 @@ class SecurityRow:
     market_cap: float = 0.0
     style_box: str = ""
     last_updated: str = ""
+
+
+@dataclass
+class IndexComponentRow:
+    index_code: str
+    ticker: str
+    last_updated: str = ""

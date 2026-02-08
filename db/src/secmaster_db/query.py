@@ -83,3 +83,22 @@ class SecMasterQuery:
                GROUP BY style_box ORDER BY count DESC""",
             self._conn,
         )
+
+    def get_index_components(self, index_code: str) -> pd.DataFrame:
+        """Return tickers for the given index."""
+        return pd.read_sql_query(
+            "SELECT ticker, last_updated FROM index_components WHERE index_code = ? ORDER BY ticker",
+            self._conn,
+            params=(index_code.upper(),),
+        )
+
+    def get_indexes(self) -> pd.DataFrame:
+        """Return summary of all indexes with component counts."""
+        return pd.read_sql_query(
+            """SELECT index_code, COUNT(*) as count,
+                      MIN(last_updated) as oldest_update,
+                      MAX(last_updated) as newest_update
+               FROM index_components
+               GROUP BY index_code ORDER BY index_code""",
+            self._conn,
+        )
