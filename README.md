@@ -1,14 +1,17 @@
 # edgar-db
 
-Download SEC EDGAR financial data (income statement, balance sheet, cash flow) into a local SQLite database. Query it from Python, the command line, or through a web UI.
+Download SEC EDGAR financial data and Yahoo Finance market data into local SQLite databases. Query from Python, the command line, or through a web UI.
 
-**Data source**: [SEC EDGAR](https://www.sec.gov/edgar) REST APIs (free, no API key, 10 req/sec rate limit)
+**Data sources**:
+- [SEC EDGAR](https://www.sec.gov/edgar) REST APIs (free, no API key, 10 req/sec rate limit)
+- [Yahoo Finance](https://finance.yahoo.com/) via the `yfinance` library (prices, financials, dividends, splits, stats)
 
 ## Packages
 
 | Package | Description | Docs |
 |---|---|---|
-| **edgar_db** | Core library — download, store, and query SEC financial data | [db/README.md](db/README.md) |
+| **edgar_db** | Core library — download, store, and query SEC XBRL financial data | [db/README.md](db/README.md) |
+| **yfinance_db** | Yahoo Finance — download prices, financials, dividends, splits, and stats | — |
 | **edgar_ui** | Web UI — FastAPI REST backend + Streamlit frontend | [ui/README.md](ui/README.md) |
 
 ## Quick Start
@@ -17,14 +20,31 @@ Download SEC EDGAR financial data (income statement, balance sheet, cash flow) i
 # Install everything
 pip install -e ".[all]"
 
+# --- SEC EDGAR ---
+
 # Set required SEC user agent
 export EDGAR_USER_AGENT="YourAppName your@email.com"
 
-# Download data
-python3 -m edgar_db download --ticker AAPL MSFT GOOGL
+# Download SEC data
+edgar-db download -t AAPL -t MSFT -t GOOGL
+edgar-db download --sp500                      # all S&P 500
 
 # View from the command line
-python3 -m edgar_db show AAPL
+edgar-db show AAPL
+edgar-db info
+
+# --- Yahoo Finance ---
+
+# Download market data
+yfinance-db download -t AAPL -t MSFT -t GOOGL
+yfinance-db download --sp500                   # all S&P 500
+
+# View from the command line
+yfinance-db show AAPL
+yfinance-db show AAPL --data prices
+yfinance-db info
+
+# --- Web UI ---
 
 # Start the API server
 uvicorn edgar_ui.backend.app:app --host 0.0.0.0 --port 8000
@@ -36,7 +56,7 @@ streamlit run ui/src/edgar_ui/frontend/app.py
 ## Requirements
 
 - Python 3.10+
-- `EDGAR_USER_AGENT` environment variable (required by SEC)
+- `EDGAR_USER_AGENT` environment variable (required by SEC for edgar_db)
 
 ## Development
 
@@ -44,3 +64,12 @@ streamlit run ui/src/edgar_ui/frontend/app.py
 pip install -e ".[all,dev]"
 pytest db/tests/ ui/tests/
 ```
+
+### Test summary
+
+| Suite | Tests | Description |
+|---|---|---|
+| `db/tests/` | 41 | Core edgar_db (client, parser, db, query, cli) |
+| `db/tests/test_yfinance/` | 47 | yfinance_db (client, parser, db, query, cli) |
+| `ui/tests/` | 38 | UI backend routes and frontend components |
+| **Total** | **126** | |

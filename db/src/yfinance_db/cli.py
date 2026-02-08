@@ -27,12 +27,13 @@ def cli() -> None:
 
 @cli.command()
 @click.option("--ticker", "-t", multiple=True, help="Ticker(s) to download")
+@click.option("--sp500", is_flag=True, help="Download all S&P 500 companies")
 @click.option("--force", is_flag=True, help="Re-download even if recent")
 @click.option("--period", "-p", default="5y", help="Price history period (1y, 2y, 5y, 10y, max)")
-def download(ticker: tuple[str, ...], force: bool, period: str) -> None:
+def download(ticker: tuple[str, ...], sp500: bool, force: bool, period: str) -> None:
     """Download company data from Yahoo Finance."""
-    if not ticker:
-        console.print("[red]Error:[/red] Provide at least one --ticker")
+    if not ticker and not sp500:
+        console.print("[red]Error:[/red] Provide --ticker or --sp500")
         sys.exit(1)
 
     config = _get_config()
@@ -43,7 +44,13 @@ def download(ticker: tuple[str, ...], force: bool, period: str) -> None:
     from .downloader import download_batch, download_company
 
     client = YFinanceClient(config)
-    tickers = list(ticker)
+    tickers: list[str] = list(ticker)
+    if sp500:
+        from edgar_db.sp500 import get_sp500_tickers
+
+        console.print("Fetching S&P 500 ticker list...")
+        tickers = get_sp500_tickers()
+        console.print(f"Found {len(tickers)} tickers")
 
     if len(tickers) == 1:
         t = tickers[0]

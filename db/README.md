@@ -28,7 +28,7 @@ export EDGAR_USER_AGENT="YourAppName your@email.com"
 python3 -m edgar_db download --ticker AAPL
 
 # Multiple companies
-python3 -m edgar_db download --ticker AAPL MSFT GOOGL
+python3 -m edgar_db download -t AAPL -t MSFT -t GOOGL
 
 # All S&P 500
 python3 -m edgar_db download --sp500
