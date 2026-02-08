@@ -218,6 +218,41 @@ WHERE statement = 'income' AND form = '10-K'
 SELECT * FROM companies;
 ```
 
+## Cross-Database Queries with SQLite ATTACH
+
+You can join data across multiple SQLite databases (edgar_db, yfinance_db, secmaster_db) using SQLite's `ATTACH DATABASE`. This lets you query, for example, yfinance dividends joined with secmaster index membership in a single SQL statement.
+
+```python
+import sqlite3
+import pandas as pd
+
+# Connect to the primary DB
+conn = sqlite3.connect("~/.yfinance-db/yfinance.db")
+
+# Attach the second DB under an alias
+conn.execute("ATTACH DATABASE '~/.secmaster-db/secmaster.db' AS secmaster")
+
+# Join dividends (yfinance) with index_components (secmaster)
+df = pd.read_sql_query('''
+    SELECT
+        d.date,
+        d.amount,
+        GROUP_CONCAT(ic.index_code ORDER BY ic.index_code) as indexes
+    FROM dividends d
+    JOIN secmaster.index_components ic ON d.ticker = ic.ticker
+    WHERE d.ticker = 'AAPL'
+    GROUP BY d.date, d.amount
+    ORDER BY d.date DESC
+''', conn)
+
+conn.close()
+```
+
+- `sqlite3.connect()` opens the primary DB — its tables need no prefix
+- `ATTACH DATABASE '...' AS <alias>` mounts a second DB under an alias
+- Reference attached tables as `<alias>.<table>` (e.g. `secmaster.index_components`)
+- You can attach multiple databases in one connection (e.g. edgar, yfinance, and secmaster together)
+
 ## Storage
 
 Data is stored in a single SQLite file at `~/.edgar-db/edgar.db` by default. Override with:

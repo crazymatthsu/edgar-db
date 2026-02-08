@@ -8,26 +8,26 @@ from typing import Callable
 import httpx
 import pandas as pd
 
-_HEADERS = {"User-Agent": "secmaster-db/0.1 (https://github.com; financial data tool)"}
+_HEADERS = {"User-Agent": "edgar-db/0.1 (https://github.com; financial data tool)"}
 
 
 def _fetch_wikipedia_tickers(url: str, ticker_columns: list[str]) -> list[str]:
     """Fetch tickers from a Wikipedia page table.
 
-    Tries each column name in *ticker_columns* until one is found.
+    Searches all tables on the page for a column matching one of *ticker_columns*.
     Returns cleaned ticker list (dots replaced with dashes for SEC compatibility).
     """
     resp = httpx.get(url, headers=_HEADERS, follow_redirects=True)
     resp.raise_for_status()
     tables = pd.read_html(StringIO(resp.text))
-    df = tables[0]
 
-    for col in ticker_columns:
-        if col in df.columns:
-            tickers = df[col].dropna().str.strip().tolist()
-            return [t.replace(".", "-") for t in tickers]
+    for df in tables:
+        for col in ticker_columns:
+            if col in df.columns:
+                tickers = df[col].dropna().str.strip().tolist()
+                return [t.replace(".", "-") for t in tickers]
 
-    raise ValueError(f"Could not find ticker column in table (tried {ticker_columns})")
+    raise ValueError(f"Could not find ticker column in any table (tried {ticker_columns})")
 
 
 # ---------------------------------------------------------------------------
