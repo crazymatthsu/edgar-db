@@ -39,7 +39,8 @@ all = [
 [project.scripts]
 edgar-db = "edgar_db.cli:cli"
 yfinance-db = "yfinance_db.cli:cli"
+secmaster-db = "secmaster_db.cli:cli"
 
 [tool.setuptools.packages.find]
 where = ["db/src", "ui/src"]
-include = ["edgar_db*", "edgar_ui*", "yfinance_db*"]
+include = ["edgar_db*", "edgar_ui*", "yfinance_db*", "secmaster_db*"]

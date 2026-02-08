@@ -5,6 +5,7 @@ Download SEC EDGAR financial data and Yahoo Finance market data into local SQLit
 **Data sources**:
 - [SEC EDGAR](https://www.sec.gov/edgar) REST APIs (free, no API key, 10 req/sec rate limit)
 - [Yahoo Finance](https://finance.yahoo.com/) via the `yfinance` library (prices, financials, dividends, splits, stats)
+- [OpenFIGI](https://www.openfigi.com/) API (FIGI identifiers, exchange MIC codes)
 
 ## Packages
 
@@ -12,6 +13,7 @@ Download SEC EDGAR financial data and Yahoo Finance market data into local SQLit
 |---|---|---|
 | **edgar_db** | Core library — download, store, and query SEC XBRL financial data | [db/README.md](db/README.md) |
 | **yfinance_db** | Yahoo Finance — download prices, financials, dividends, splits, and stats | — |
+| **secmaster_db** | Security Master — identifiers (ISIN, FIGI), exchange info, sector/industry, style box | — |
 | **edgar_ui** | Web UI — FastAPI REST backend + Streamlit frontend | [ui/README.md](ui/README.md) |
 
 ## Quick Start
@@ -44,6 +46,24 @@ yfinance-db show AAPL
 yfinance-db show AAPL --data prices
 yfinance-db info
 
+# --- Security Master ---
+
+# Download security reference data
+secmaster-db download -t AAPL -t MSFT -t GOOGL
+secmaster-db download --sp500                   # all S&P 500
+secmaster-db download -t AAPL --no-figi         # skip OpenFIGI lookup
+
+# View security details
+secmaster-db show AAPL
+
+# Search by criteria
+secmaster-db search --sector Technology
+secmaster-db search --style-box large_cap
+secmaster-db search --country "United States"
+
+# Database stats
+secmaster-db info
+
 # --- Web UI ---
 
 # Start the API server
@@ -60,6 +80,8 @@ streamlit run ui/src/edgar_ui/frontend/app.py
 | `EDGAR_USER_AGENT` | Yes (edgar_db) | — | SEC requires a user agent string (e.g. `"MyApp me@email.com"`) |
 | `EDGAR_DB_PATH` | No | `~/.edgar-db/edgar.db` | Custom path for the SEC EDGAR SQLite database |
 | `YFINANCE_DB_PATH` | No | `~/.yfinance-db/yfinance.db` | Custom path for the Yahoo Finance SQLite database |
+| `SECMASTER_DB_PATH` | No | `~/.secmaster-db/secmaster.db` | Custom path for the Security Master SQLite database |
+| `OPENFIGI_API_KEY` | No | — | OpenFIGI API key for higher rate limits (250 vs 25 req/min) |
 
 ## Requirements
 
@@ -78,5 +100,6 @@ pytest db/tests/ ui/tests/
 |---|---|---|
 | `db/tests/` | 41 | Core edgar_db (client, parser, db, query, cli) |
 | `db/tests/test_yfinance/` | 47 | yfinance_db (client, parser, db, query, cli) |
+| `db/tests/test_secmaster/` | 43 | secmaster_db (client, parser, db, query, cli) |
 | `ui/tests/` | 38 | UI backend routes and frontend components |
-| **Total** | **126** | |
+| **Total** | **169** | |
