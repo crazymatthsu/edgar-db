@@ -18,7 +18,13 @@ def get_sp500_tickers() -> list[str]:
     except ImportError:
         raise ImportError("pandas is required for S&P 500 list fetching")
 
-    tables = pd.read_html(_WIKI_URL)
+    # Use httpx to fetch HTML to avoid macOS SSL cert issues with urllib
+    from io import StringIO
+
+    headers = {"User-Agent": "edgar-db/0.1 (https://github.com; financial data tool)"}
+    resp = httpx.get(_WIKI_URL, headers=headers, follow_redirects=True)
+    resp.raise_for_status()
+    tables = pd.read_html(StringIO(resp.text))
     df = tables[0]
 
     # The column is typically "Symbol" or "Ticker symbol"

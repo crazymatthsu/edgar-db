@@ -1,0 +1,34 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.3.6 Chrome/140.0.7339.249 Electron/38.8.0 Safari/537.36" version="29.3.6">
+  <diagram name="Page-1" id="uYx5tSh-vBI-aXe3xsDE">
+    <mxGraphModel dx="1106" dy="694" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ezBKmAQ8HywxXbn0Vub3-3" edge="1" parent="1" source="ezBKmAQ8HywxXbn0Vub3-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ezBKmAQ8HywxXbn0Vub3-2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ezBKmAQ8HywxXbn0Vub3-5" edge="1" parent="1" source="ezBKmAQ8HywxXbn0Vub3-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ezBKmAQ8HywxXbn0Vub3-4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ezBKmAQ8HywxXbn0Vub3-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="db" vertex="1">
+          <mxGeometry height="60" width="70" x="300" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="ezBKmAQ8HywxXbn0Vub3-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="edgar_db" vertex="1">
+          <mxGeometry height="60" width="90" x="450" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="ezBKmAQ8HywxXbn0Vub3-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="yfinance_db" vertex="1">
+          <mxGeometry height="60" width="90" x="450" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="ezBKmAQ8HywxXbn0Vub3-8" edge="1" parent="1" source="ezBKmAQ8HywxXbn0Vub3-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ezBKmAQ8HywxXbn0Vub3-7" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ezBKmAQ8HywxXbn0Vub3-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="ui" vertex="1">
+          <mxGeometry height="60" width="70" x="300" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="ezBKmAQ8HywxXbn0Vub3-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="edgar_ui" vertex="1">
+          <mxGeometry height="60" width="90" x="450" y="320" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
